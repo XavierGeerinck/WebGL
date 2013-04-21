@@ -4,10 +4,10 @@ function WebGL(cid, fsid, vsid) {
         alert("Your Browser Doesn't Support WebGL");
     else
     {
-        this.GL = (canvas.getContext("webgl")) ? canvas.getContext("webgl") : canvas.getContext("experimental-webgl");
-        this.GL.clearColor(1.0, 1.0, 1.0, 1.0); // This is the color
-        this.GL.enable(this.GL.DEPTH_TEST); // Enable Depth Testing
-        this.GL.depthFunc(this.GL.LEQUAL); // Set perspective View
+        this.gl = (canvas.getContext("webgl")) ? canvas.getContext("webgl") : canvas.getContext("experimental-webgl");
+        this.gl.clearColor(1.0, 1.0, 1.0, 1.0); // This is the color
+        this.gl.enable(this.gl.DEPTH_TEST); // Enable Depth Testing
+        this.gl.depthFunc(this.gl.LEQUAL); // Set perspective View
         this.aspectRatio = canvas.width / canvas.height;
 
         // Load shaders here.
@@ -30,30 +30,30 @@ function WebGL(cid, fsid, vsid) {
         {
             // Load and Compile the Fragment Shader
             var code = loadShader(fShader);
-            fShader = this.GL.createShader(this.GL.FRAGMENT_SHADER);
-            this.GL.shaderSource(fShader, code);
-            this.GL.compileShader(fShader);
+            fShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+            this.gl.shaderSource(fShader, code);
+            this.gl.compileShader(fShader);
 
             // Load and Compile the Vertex Shader
             code = loadShader(vShader);
-            vShader = this.GL.createShader(this.GL.VERTEX_SHADER);
-            this.GL.shaderSource(vShader, code);
-            this.GL.compileShader(vShader);
+            vShader = this.gl.createShader(this.gl.VERTEX_SHADER);
+            this.gl.shaderSource(vShader, code);
+            this.gl.compileShader(vShader);
 
             // Create the Shader program
-            this.shaderProgram = this.GL.createProgram();
-            this.GL.attachShader(this.shaderProgram, fShader);
-            this.GL.attachShader(this.shaderProgram, vShader);
-            this.GL.linkProgram(this.shaderProgram);
-            this.GL.useProgram(this.shaderProgram);
+            this.shaderProgram = this.gl.createProgram();
+            this.gl.attachShader(this.shaderProgram, fShader);
+            this.gl.attachShader(this.shaderProgram, vShader);
+            this.gl.linkProgram(this.shaderProgram);
+            this.gl.useProgram(this.shaderProgram);
 
             // Link Vertex position attribute from shader
-            this.vertexPosition = this.GL.getAttribLocation(this.shaderProgram, "VertexPosition");
-            this.GL.enableVertexAttribArray(this.vertexPosition);
+            this.vertexPosition = this.gl.getAttribLocation(this.shaderProgram, "VertexPosition");
+            this.gl.enableVertexAttribArray(this.vertexPosition);
 
             // Link Texture Coordinate Attribute from Shader
-            this.vertexTexture = this.GL.getAttribLocation(this.shaderProgram, "TextureCoord");
-            this.GL.enableVertexAttribArray(this.vertexTexture);
+            this.vertexTexture = this.gl.getAttribLocation(this.shaderProgram, "TextureCoord");
+            this.gl.enableVertexAttribArray(this.vertexTexture);
         }
 
         this.draw = function (model) {
@@ -62,35 +62,35 @@ function WebGL(cid, fsid, vsid) {
             }
 
             if (model.ready) {
-                this.GL.bindBuffer(this.GL.ARRAY_BUFFER, model.vertices);
-                this.GL.vertexAttribPointer(this.vertexPosition, 3, this.GL.FLOAT, false, 0, 0);
-                this.GL.bindBuffer(this.GL.ARRAY_BUFFER, model.textureMap);
-                this.GL.vertexAttribPointer(this.vertexTexture, 2, this.GL.FLOAT, false, 0, 0);
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, model.vertices);
+                this.gl.vertexAttribPointer(this.vertexPosition, 3, this.gl.FLOAT, false, 0, 0);
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, model.textureMap);
+                this.gl.vertexAttribPointer(this.vertexTexture, 2, this.gl.FLOAT, false, 0, 0);
 
-                this.GL.bindBuffer(this.GL.ELEMENT_ARRAY_BUFFER, model.triangles);
+                this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, model.triangles);
 
                 //Generate The Perspective Matrix
-                var PerspectiveMatrix = makePerspective(45, this.aspectRatio, 1, 1000.0);
+                var perspectiveMatrix = makePerspective(45, this.aspectRatio, 1, 1000.0);
 
-                var TransformMatrix = model.getTransforms();
+                var transformMatrix = model.getTransforms();
                 //Set slot 0 as the active Texture
-                this.GL.activeTexture(this.GL.TEXTURE0);
+                this.gl.activeTexture(this.gl.TEXTURE0);
 
                 //Load in the Texture To Memory
-                this.GL.bindTexture(this.GL.TEXTURE_2D, model.Image);
+                this.gl.bindTexture(this.gl.TEXTURE_2D, model.Image);
 
                 //Update The Texture Sampler in the fragment shader to use slot 0
-                this.GL.uniform1i(this.GL.getUniformLocation(this.shaderProgram, "uSampler"), 0);
+                this.gl.uniform1i(this.gl.getUniformLocation(this.shaderProgram, "uSampler"), 0);
 
                 //Set The Perspective and Transformation Matrices
-                var pmatrix = this.GL.getUniformLocation(this.shaderProgram, "PerspectiveMatrix");
-                this.GL.uniformMatrix4fv(pmatrix, false, new Float32Array(PerspectiveMatrix));
+                var pmatrix = this.gl.getUniformLocation(this.shaderProgram, "PerspectiveMatrix");
+                this.gl.uniformMatrix4fv(pmatrix, false, new Float32Array(perspectiveMatrix));
 
-                var tmatrix = this.GL.getUniformLocation(this.shaderProgram, "TransformationMatrix");
-                this.GL.uniformMatrix4fv(tmatrix, false, new Float32Array(TransformMatrix));
+                var tmatrix = this.gl.getUniformLocation(this.shaderProgram, "TransformationMatrix");
+                this.gl.uniformMatrix4fv(tmatrix, false, new Float32Array(transformMatrix));
 
                 //draw The Triangles
-                this.GL.drawElements(this.GL.TRIANGLES, model.triangleCount, this.GL.UNSIGNED_SHORT, 0);
+                this.gl.drawElements(this.gl.TRIANGLES, model.triangleCount, this.gl.UNSIGNED_SHORT, 0);
             }
         };
 
@@ -98,22 +98,22 @@ function WebGL(cid, fsid, vsid) {
             model.image = this.loadTexture(model.image);
 
             //Convert Arrays to buffers
-            var buffer = this.GL.createBuffer();
+            var buffer = this.gl.createBuffer();
 
-            this.GL.bindBuffer(this.GL.ARRAY_BUFFER, buffer);
-            this.GL.bufferData(this.GL.ARRAY_BUFFER, new Float32Array(model.vertices), this.GL.STATIC_DRAW);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(model.vertices), this.gl.STATIC_DRAW);
             model.vertices = buffer;
 
-            buffer = this.GL.createBuffer();
+            buffer = this.gl.createBuffer();
 
-            this.GL.bindBuffer(this.GL.ELEMENT_ARRAY_BUFFER, buffer);
-            this.GL.bufferData(this.GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.triangles), this.GL.STATIC_DRAW);
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer);
+            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.triangles), this.gl.STATIC_DRAW);
             model.triangles = buffer;
 
-            buffer = this.GL.createBuffer();
+            buffer = this.gl.createBuffer();
 
-            this.GL.bindBuffer(this.GL.ARRAY_BUFFER, buffer);
-            this.GL.bufferData(this.GL.ARRAY_BUFFER, new Float32Array(model.textureMap), this.GL.STATIC_DRAW);
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(model.textureMap), this.gl.STATIC_DRAW);
             model.textureMap = buffer;
 
             model.ready = true;
@@ -129,19 +129,20 @@ function WebGL(cid, fsid, vsid) {
          */
         this.loadTexture = function(img){
             //Create a new Texture and Assign it as the active one
-            var tempTex = this.GL.createTexture();
-            this.GL.bindTexture(this.GL.TEXTURE_2D, tempTex);
-            this.GL.pixelStorei(this.GL.UNPACK_FLIP_Y_WEBGL, true);
+            var tempTex = this.gl.createTexture();
+            this.gl.bindTexture(this.gl.TEXTURE_2D, tempTex);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
             //Load in The Image
-            this.GL.texImage2D(this.GL.TEXTURE_2D, 0, this.GL.RGBA, this.GL.RGBA, this.GL.UNSIGNED_BYTE, img);
+            this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, img);
 
             //Setup Scaling properties
-            this.GL.texParameteri(this.GL.TEXTURE_2D, this.GL.TEXTURE_MAG_FILTER, this.GL.LINEAR);
-            this.GL.texParameteri(this.GL.TEXTURE_2D, this.GL.TEXTURE_MIN_FILTER, this.GL.LINEAR_MIPMAP_NEAREST);
-            this.GL.generateMipmap(this.GL.TEXTURE_2D);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
+            this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
             //Unbind the texture and return it.
-            this.GL.bindTexture(this.GL.TEXTURE_2D, null);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+
             return tempTex;
         };
     }
