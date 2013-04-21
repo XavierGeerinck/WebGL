@@ -4,17 +4,17 @@
     created on the monitor
 
     Script Info:
-    Create the vector shader and define 2 attributes VertexPosition and TextureCoord
+    Create the vector shader and define 2 attributes vertexPosition and TextureCoord
 
     Variable Info:
-    VertexPosition: Is the location of the x,y,z coordinates of the current vertex (=Point in your model)
+    vertexPosition: Is the location of the x,y,z coordinates of the current vertex (=Point in your model)
     TextureCoord: Is the location in the textureimage that should be assigned to this point.
     TransformationMatrix: Convert the 2D model into a 2D image. // Todo more info
     PerspectiveMatrix: Convert the 2D model into a 2D image. //Todo more info
     vTextureCoord: create shared variable to the fragment shader. //Todo more info
 
     Void Main Info:
-    Create the 2d points that are going to be placed on the screen by multiplying the PerspectiveMatrix, TransformationMatrix and the new Vertex of the VertexPosition Attribute.
+    Create the 2d points that are going to be placed on the screen by multiplying the PerspectiveMatrix, TransformationMatrix and the new Vertex of the vertexPosition Attribute.
     After that assign the TextureCoord to the shared shader memory.
 -->
 <script id="VertexShader" type="x-shader/x-vertex">
@@ -90,7 +90,7 @@
                 model.rotation.Y += 0.2;
 
                 // Try loading our object from the json
-                GL.Draw(model);
+                GL.draw(model);
             }
 
         </script>

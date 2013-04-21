@@ -1,73 +1,58 @@
 function Model(vertexArr, triangleArr, textureArr, imageSrc) {
-    this.pos = {
-        x: 0,
-        y: 0,
-        z: 0
-    };
-    this.scale = {
-        x: 1.0,
-        y: 1.0,
-        z: 1.0
-    };
-    this.rotation = {
-        x: 0,
-        y: 0,
-        z: 0
-    };
+    this.pos = { x: 0, y: 0, z: 0 };
+    this.scale = { x: 1.0, y: 1.0, z: 1.0 };
+    this.rotation = { x: 0, y: 0, z: 0 };
     this.vertices = vertexArr;
     this.triangles = triangleArr;
     this.triangleCount = triangleArr.length;
     this.textureMap = textureArr;
     this.image = new Image();
-    this.image.onload = function () {
-        this.readyState = true;
-    };
+    this.image.onload = function () { this.readyState = true; };
     this.image.src = imageSrc;
     this.ready = false;
-
     this.getTransforms = function () {
         //Create a Blank Identity Matrix
-        var TMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        var tMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
         //Scaling
-        var Temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-        Temp[0] *= this.scale.x;
-        Temp[5] *= this.scale.y;
-        Temp[10] *= this.scale.z;
-        TMatrix = MultiplyMatrix(TMatrix, Temp);
+        var temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        temp[0] *= this.scale.x;
+        temp[5] *= this.scale.y;
+        temp[10] *= this.scale.z;
+        tMatrix = multiplyMatrix(tMatrix, temp);
 
         //Rotating X
-        Temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
         var x = this.rotation.X * (Math.PI / 180.0);
-        Temp[5] = Math.cos(x);
-        Temp[6] = Math.sin(x);
-        Temp[9] = -1 * Math.sin(x);
-        Temp[10] = Math.cos(x);
-        TMatrix = MultiplyMatrix(TMatrix, Temp);
+        temp[5] = Math.cos(x);
+        temp[6] = Math.sin(x);
+        temp[9] = -1 * Math.sin(x);
+        temp[10] = Math.cos(x);
+        tMatrix = multiplyMatrix(tMatrix, temp);
         //Rotating Y
-        Temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
         var y = this.rotation.y * (Math.PI / 180.0);
-        Temp[0] = Math.cos(y);
-        Temp[2] = -1 * Math.sin(y);
-        Temp[8] = Math.sin(y);
-        Temp[10] = Math.cos(y);
-        TMatrix = MultiplyMatrix(TMatrix, Temp);
+        temp[0] = Math.cos(y);
+        temp[2] = -1 * Math.sin(y);
+        temp[8] = Math.sin(y);
+        temp[10] = Math.cos(y);
+        tMatrix = multiplyMatrix(tMatrix, temp);
 
         //Rotating Z
-        Temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
         var z = this.rotation.z * (Math.PI / 180.0);
-        Temp[0] = Math.cos(z);
-        Temp[1] = Math.sin(z);
-        Temp[4] = -1 * Math.sin(z);
-        Temp[5] = Math.cos(z);
-        TMatrix = MultiplyMatrix(TMatrix, Temp);
+        temp[0] = Math.cos(z);
+        temp[1] = Math.sin(z);
+        temp[4] = -1 * Math.sin(z);
+        temp[5] = Math.cos(z);
+        tMatrix = multiplyMatrix(tMatrix, temp);
         //Moving
-        Temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-        Temp[12] = this.pos.x;
-        Temp[13] = this.pos.y;
-        Temp[14] = this.pos.z * -1;
+        temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        temp[12] = this.pos.x;
+        temp[13] = this.pos.y;
+        temp[14] = this.pos.z * -1;
 
-        return MultiplyMatrix(TMatrix, Temp);
+        return multiplyMatrix(tMatrix, temp);
     }
 }
 
@@ -82,7 +67,7 @@ function getFile(url, callback) {
         // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
         // Status 200 == OK
         if (this.status == 200) {
-            callback(parseResponse(this.response));
+            callback(parseObject(this.response));
         }
     };
 
@@ -235,10 +220,12 @@ function parseObject(object) {
         "normalMap": normalMap
     });
 
+    console.log(triangleCounter);
+
     return json;
 /*
     var Cube = {
-        Rotation: 0,
+        rotation: 0,
         Vertices : [ // X, Y, Z Coordinates
 
             //Front
