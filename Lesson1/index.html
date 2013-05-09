@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>WebGl Lesson 1 - Drawing simple triangle and square</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- SHORTUCT ICON -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css" type="text/css"/>
+
+    <!-- JS -->
+    <script type="text/javascript" src="js/lib/common.js"></script>
+    <script type="text/javascript" src="js/lib/vec3.js"></script>
+    <script type="text/javascript" src="js/lib/mat4.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+
+    <!--
+        This is not Javascript, this is a special shader language called GLSL
+
+        Here we just say how precies we want to be with the numbers (medium precision)
+        Then the next line specifies we are going to draw everything in white.
+    -->
+    <script id="shader-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        void main(void) {
+            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        }
+    </script>
+
+    <!--
+       This is not Javascript, this is a special shader language called GLSL
+
+       This is a vertex shader, it'sa bit of graphics card code that can do anything that it wants with a vertex.
+       it got 2 variables uMVMatrix and uPMAtrix. Uniform variables are useful because they can be accessed from outside the shader.
+       We set those to the values of the model-view and the projection matrices. (Think that the shader's program is an object and the uniform variables are the fields)
+
+       Next we call the shader for every vertex and the vertex is passed in to the shader code as aVertexPosition, because we used  the vertexPositionAttribute
+       in the drawScene, when we associated the attribute with the buffer.
+
+       The tiny bit of code in the sahder's main routine just multiplies the vertex's position with the model-view and projection matrices and pushes out the final result.
+    -->
+    <script id="shader-vs" type="x-shader/x-vertex">
+        attribute vec3 aVertexPosition;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        void main(void) {
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        }
+    </script>
+</head>
+<body>
+
+<canvas id="canvas" width="500px" height="500px">
+
+</canvas>
+
+</body>
+</html>

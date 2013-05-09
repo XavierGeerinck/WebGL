@@ -12,10 +12,17 @@ function Model(vertexArr, triangleArr, textureArr, imageSrc) {
     this.ready = false;
     this.getTransforms = function () {
         //Create a Blank Identity Matrix
-        var tMatrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        var tMatrix = [1, 0, 0, 0,
+                       0, 1, 0, 0,
+                       0, 0, 1, 0,
+                       0, 0, 0, 1];
 
         //Scaling
-        var temp = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+        var temp = [1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1];
+
         temp[0] *= this.scale.x;
         temp[5] *= this.scale.y;
         temp[10] *= this.scale.z;
@@ -210,23 +217,9 @@ function parseObject(object) {
         }
     }
 
-    json.push({
-        "vertices": vertices,
-        "triangles": triangles,
-        "textures": textures,
-        "normals": normals,
-        "verticeMap": verticeMap,
-        "textureMap": textureMap,
-        "normalMap": normalMap
-    });
-
-    console.log(triangleCounter);
-
-    return json;
-/*
     var Cube = {
         rotation: 0,
-        Vertices : [ // X, Y, Z Coordinates
+        vertices : [ // X, Y, Z Coordinates
 
             //Front
 
@@ -271,7 +264,7 @@ function parseObject(object) {
             -1.0, -1.0, -1.0
 
         ],
-        Triangles : [ // Also in groups of threes to define the three points of each triangle
+        triangles : [ // Also in groups of threes to define the three points of each triangle
             //The numbers here are the index numbers in the vertex array
 
             //Front
@@ -305,7 +298,7 @@ function parseObject(object) {
             21, 22, 23
 
         ],
-        Texture : [ //This array is in groups of two, the x and y coordinates (a.k.a U,V) in the texture
+        texture : [ //This array is in groups of two, the x and y coordinates (a.k.a U,V) in the texture
             //The numbers go from 0.0 to 1.0, One pair for each vertex
 
             //Front
@@ -352,6 +345,21 @@ function parseObject(object) {
             1.0, 1.0
         ]
     };
+
+    /*json.push({
+        "vertices": vertices,
+        "triangles": triangles,
+        "textures": textures,
+        "normals": normals,
+        "verticeMap": verticeMap,
+        "textureMap": textureMap,
+        "normalMap": normalMap
+    });*/
+return Cube;
+
+    return json;
+/*
+
 
     //return Cube;
 

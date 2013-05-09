@@ -1,25 +1,69 @@
-<!--
-    Definition Vertex Shader:
-    Converts the 3D Points into 2D points, this because the computer monitors are 2D and a 3D object is an illusion
-    created on the monitor
 
-    Script Info:
-    Create the vector shader and define 2 attributes vertexPosition and TextureCoord
+<html>
+<head>
+    <!-- Include Our WebGL JS file -->
+    <script src="WebGL.js" type="text/javascript"></script>
+    <script>
 
-    Variable Info:
-    vertexPosition: Is the location of the x,y,z coordinates of the current vertex (=Point in your model)
-    TextureCoord: Is the location in the textureimage that should be assigned to this point.
-    TransformationMatrix: Convert the 2D model into a 2D image. // Todo more info
-    PerspectiveMatrix: Convert the 2D model into a 2D image. //Todo more info
-    vTextureCoord: create shared variable to the fragment shader. //Todo more info
+        var GL;
+        var Building;
 
-    Void Main Info:
-    Create the 2d points that are going to be placed on the screen by multiplying the PerspectiveMatrix, TransformationMatrix and the new Vertex of the vertexPosition Attribute.
-    After that assign the TextureCoord to the shared shader memory.
--->
+        function Ready(){
+            GL = new WebGL("GLCanvas", "FragmentShader", "VertexShader");
+            LoadModel("House", function(VerticeMap, Triangles, TextureMap){
+                Building = new GLObject(VerticeMap, Triangles, TextureMap, "House.png");
+                Building.Pos.Z = 650;
+                Building.Scale.X = 0.5;
+                Building.Scale.Y = 0.5;
+                Building.Scale.Z = 0.5;
+                Building.Rotation.Y = 180;
+                setInterval(Update, 33);
+                document.onkeydown = handleKeyDown;
+            });
+        }
+        function handleKeyDown(event){
+            //You can uncomment the next line to find out what keycode goes to which key
+            //alert(event.keyCode);
+
+            if(event.keyCode == 37)
+            {
+                //Left Arrow Key
+                Building.Pos.X -= 4;
+            }
+            else if(event.keyCode == 38)
+            {
+                //Up Arrow Key
+                Building.Pos.Y += 4;
+            }
+            else if(event.keyCode == 39)
+            {
+                //Right Arrow Key
+                Building.Pos.X += 4;
+            }
+            else if(event.keyCode == 40)
+            {
+                //Down Arrow Key
+                Building.Pos.Y -= 4;
+            }
+        }
+        function Update(){
+            Building.Rotation.Y += 0.3
+            GL.GL.clear(16384 | 256);
+            GL.Draw(Building);
+        }
+
+    </script>
+</head>
+<body onload="Ready()">
+<canvas id="GLCanvas" width="1280" height="1020">
+    Your Browser Doesn't Support HTML5's Canvas.
+</canvas>
+
 <script id="VertexShader" type="x-shader/x-vertex">
+
     attribute highp vec3 VertexPosition;
     attribute highp vec2 TextureCoord;
+
 
     uniform highp mat4 TransformationMatrix;
     uniform highp mat4 PerspectiveMatrix;
@@ -27,82 +71,22 @@
     varying highp vec2 vTextureCoord;
 
     void main(void) {
-        gl_Position = PerspectiveMatrix * TransformationMatrix * vec4(VertexPosition, 1.0);
-        vTextureCoord = TextureCoord;
+    gl_Position = PerspectiveMatrix * TransformationMatrix * vec4(VertexPosition, 1.0);
+    vTextureCoord = TextureCoord;
     }
 </script>
 
-<!--
-    Definition Fragment Shader:
-    It will tell WebGL what color a given point on your model should be used
--->
 <script id="FragmentShader" type="x-shader/x-fragment">
     varying highp vec2 vTextureCoord;
 
     uniform sampler2D uSampler;
 
     void main(void) {
-        highp vec4 texelColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-        gl_FragColor = texelColor;
+    highp vec4 texelColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    gl_FragColor = texelColor;
     }
 </script>
 
-<html>
-    <head>
-        <!-- Include the WebGL.js file -->
-        <script src="WebGL.js" type="text/javascript"></script>
-        <script src="ObjToJson.js" type="text/javascript"></script>
 
-        <script>
-            // Hold the WebGL variable
-            var GL;
-
-            // Finished texture
-            var Texture;
-
-            // Texture image
-            var TextureImage;
-            var jsonObjectToLoad;
-            var Tick;
-            var model;
-
-            function Ready(){
-                GL = new WebGL("GLCanvas", "FragmentShader", "VertexShader");
-
-                getFile("assets/House.obj", function(json) {
-                    object = json[0];
-
-                    model = new Model(object.vertices, object.triangles, object.textureMap, "assets/House.png");
-
-                    //My Model Was a bit too big
-                    model.scale.X = 0.5;
-                    model.scale.Y = 0.5;
-                    model.scale.Z = 0.5;
-
-                    //And Backwards
-                    model.rotation.Y = 180;
-
-                    setInterval(Update, 33);
-                });
-            }
-
-            function Update() {
-                model.rotation.Y += 0.2;
-
-                // Try loading our object from the json
-                GL.draw(model);
-            }
-
-        </script>
-    </head>
-
-    <body onLoad="Ready()">
-        <canvas id="GLCanvas" width="720" height="480">
-            Your browser does not support HTML5 canvases.
-        </canvas>
-
-        <!-- Vertex Shader -->
-
-        <!-- Fragment Shader -->
-    </body>
+</body>
 </html>
