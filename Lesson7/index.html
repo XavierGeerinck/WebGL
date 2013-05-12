@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>WebGl Lesson 7 - Adding Lightning</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- SHORTUCT ICON -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css" type="text/css"/>
+
+    <!-- JS -->
+    <script type="text/javascript" src="js/lib/webgl-utils.js"></script>
+    <script type="text/javascript" src="js/lib/common.js"></script>
+    <script type="text/javascript" src="js/lib/vec3.js"></script>
+    <script type="text/javascript" src="js/lib/mat3.js"></script>
+    <script type="text/javascript" src="js/lib/mat4.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+    <!--
+        textures use s and t for the coordinates, so we say that we will use the function texture2D (which gets the appropiate color form the texture using the coordinates)
+    -->
+    <script id="shader-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        varying vec2 vTextureCoord;
+        varying vec3 vLightWeighting;
+
+        uniform sampler2D uSampler;
+
+        void main(void) {
+            vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+            gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+        }
+    </script>
+
+    <script id="shader-vs" type="x-shader/x-vertex">
+        attribute vec3 aVertexPosition;
+        attribute vec3 aVertexNormal;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+        uniform mat3 uNMatrix;
+
+        uniform vec3 uAmbientColor;
+
+        uniform vec3 uLightingDirection;
+        uniform vec3 uDirectionalColor;
+
+        uniform bool uUseLighting;
+
+        varying vec2 vTextureCoord;
+        varying vec3 vLightWeighting;
+
+        void main(void) {
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            vTextureCoord = aTextureCoord;
+
+            if (!uUseLighting) {
+                vLightWeighting = vec3(1.0, 1.0, 1.0);
+            } else {
+                vec3 transformedNormal = uNMatrix * aVertexNormal;
+                float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+                vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+            }
+        }
+    </script>
+</head>
+<body>
+
+<canvas id="canvas" width="500px" height="500px">
+
+</canvas>
+
+Show Lighting: <input type="checkbox" id="lighting" />
+
+<h2>Directional light:</h2>
+
+<table style="border: 0; padding: 10px;">
+    <tr>
+        <td><b>Direction:</b>
+        <td>X: <input type="text" id="lightDirectionX" value="-0.25" />
+        <td>Y: <input type="text" id="lightDirectionY" value="-0.25" />
+        <td>Z: <input type="text" id="lightDirectionZ" value="-1.0" />
+    </tr>
+    <tr>
+        <td><b>Colour:</b>
+        <td>R: <input type="text" id="directionalR" value="0.8" />
+        <td>G: <input type="text" id="directionalG" value="0.8" />
+        <td>B: <input type="text" id="directionalB" value="0.8" />
+    </tr>
+</table>
+
+<h2>Ambient light:</h2>
+<table style="border: 0; padding: 10px;">
+    <tr>
+        <td><b>Colour:</b>
+        <td>R: <input type="text" id="ambientR" value="0.2" />
+        <td>G: <input type="text" id="ambientG" value="0.2" />
+        <td>B: <input type="text" id="ambientB" value="0.2" />
+    </tr>
+</table>
+
+</body>
+</html>
